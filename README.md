@@ -10,7 +10,7 @@
 
 ### Description
 
-In the modern world, Game Developement is dominated by big name languages such as C++ and Java, this project challenges that aproach. Instead, pushing that Game Dev can be done using any language, even esoterics like Whitespace, with equal success to the big name languages that the industry pushes. This game was written in Whitespace Assembly and assembled to pure Whitespace, it was made over a span of 2 days, and has memory management, error checking, and protection against overflow attacks. As is made appearent, it is a recreation of the classic pen and paper game, Tic-Tac-Toe, (also called Knots and Crosses).
+In the modern world, Game Developement is dominated by big name languages such as C++ and Java, this project challenges that aproach. Instead, pushing that Game Dev can be done using any language, even esoterics like [Whitespace](https://en.wikipedia.org/wiki/Whitespace_(programming_language)), with equal success to the big name languages that the industry pushes. This game was written in Whitespace Assembly and assembled to pure Whitespace, it was made over a span of 2 days, and has memory management, error checking, and protection against overflow attacks. As is made appearent, it is a recreation of the classic pen and paper game, Tic-Tac-Toe, (also called Knots and Crosses).
 
 ![Example of X winning a game](https://github.com/SpicedSage/ReadmeIMGS/blob/main/ingame.png?raw=true)
 
