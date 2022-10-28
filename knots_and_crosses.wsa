@@ -1,0 +1,670 @@
+jmp main
+
+# data
+welcomeMessage:
+	push "Welcome, who would you like to have the first move X's or O's? (press x or o)\n> "
+	ret
+
+moveMessage:
+	push 'Enter cordinate where youd like to go, ex C1 would have you mark the Top-Right corner\n'
+	ret
+
+movePrompt:
+	push '\'s Move:'
+	ret
+
+winMessage:
+	push '  Wins!!\n  Would you like to play again? (press y or n):'
+	ret
+
+Tie:
+	drop
+	push '  No One'
+	ret
+
+playerX:
+	drop
+	push '  X'
+	ret
+
+playerY:
+	drop
+	push '  O'
+	ret
+
+xIcon:
+	drop
+	push 'X'
+	jmp drawBoard.getPlaceRet
+
+oIcon: 
+	drop
+	push 'O'
+	jmp drawBoard.getPlaceRet
+
+bIcon:
+	drop
+	push ' '
+	jmp drawBoard.getPlaceRet
+
+# start
+main:
+	call welcomeMessage
+	call print
+
+	call getChar
+	call clearInputStream
+	
+	push 1
+	push 'x'
+	store
+
+	call compare
+	jz userChoiceX
+
+	push 1
+	push 'o'
+	store
+
+	call compare
+	jz userChoiceO
+
+	jmp main
+
+.userChoiceContinue:
+	call createBoard
+
+.gameloop:
+	call newline
+	call newline
+	call newline
+	call newline
+	call newline
+
+	call drawBoard
+
+	call checkForWin
+
+    #reversed
+	push 0
+	call movePrompt
+
+	push 100
+	retrieve
+	push 2
+	sub
+	dup
+	jz .playerPromptY
+	dup
+	jn .playerPromptX
+
+	push 100
+	push 1
+	store
+	jmp .gameloop
+
+.playerPromptX:
+	call playerX
+	jmp .playerPromptContinue
+
+.playerPromptY:
+	call playerY
+	jmp .playerPromptContinue
+
+.playerPromptContinue:
+
+	call moveMessage
+	
+	call newline
+
+	call print
+
+	# get first 2 char of user input store in 101 and 102
+	call getChar
+	push 0
+	retrieve
+	push 101
+	copy 1
+	store
+	
+	dup
+	push 'A'
+	sub
+	jz .A
+
+	dup
+	push 'B'
+	sub
+	jz .B
+
+	dup
+	push 'C'
+	sub
+	jz .C
+
+	drop
+	call clearInputStream
+	jmp .gameloop
+
+.A:
+	drop
+	push 0
+	jmp .continueNum
+.B:
+	drop 
+	push 1
+	jmp .continueNum
+.C:
+	drop
+	push 2
+	jmp .continueNum
+
+.continueNum:
+	push 103
+	swap
+	store
+
+	call getChar
+	push 0
+	retrieve
+	push 102
+	copy 1
+	store
+
+	dup
+	push '1'
+	sub 
+	jz .1
+
+	dup 
+	push '2'
+	sub
+	jz .2
+
+	dup
+	push '3'
+	sub
+	jz .3
+
+	drop
+	call clearInputStream
+	jmp .gameloop
+
+.1:
+	drop
+	push 0 
+	jmp .continueMove
+.2:
+	drop
+	push 3
+	jmp .continueMove
+.3:
+	drop
+	push 6
+	jmp .continueMove
+
+.continueMove:
+	push 103
+	retrieve
+	add
+	push 110
+	add
+	dup
+	push 103
+	swap
+	store
+
+	call clearInputStream
+
+	dup
+	retrieve
+	jz .unocupied
+
+	drop
+	jmp .gameloop
+
+.unocupied:
+	push 100
+	retrieve
+
+	dup
+	push 1
+	sub
+	jz .xTurn
+	
+	dup 
+	push 2
+	sub
+	jz .yTurn
+
+	push 100
+	push 1
+	store
+	drop
+	jmp .gameloop
+
+.xTurn:
+	drop
+	push 1
+	push 2
+	jmp .finalyPlaceMark
+.yTurn:
+	drop
+	push 2
+	push 1
+	jmp .finalyPlaceMark
+
+.finalyPlaceMark:
+	push 100
+	swap
+	store
+	store
+
+	jmp .gameloop
+.gameEnd:
+	drop
+	
+	dup
+	jz .gameEndTie
+
+	dup
+	push 1
+	sub
+	jz .gameEndPlayerX
+	
+	dup
+	push 2
+	sub
+	jz .gameEndPlayerY
+
+	drop
+	jmp exit
+
+.gameEndPlayerX:
+	drop
+	push 0
+	call winMessage
+	call playerX
+	jmp .gameEndContinue
+
+.gameEndPlayerY:
+	drop
+	push 0
+	call winMessage
+	call playerY
+	jmp .gameEndContinue
+
+.gameEndTie:
+	drop
+	push 0
+	call winMessage
+	call Tie
+	jmp .gameEndContinue
+
+.gameEndContinue:
+	call print
+
+	call getChar
+	call clearInputStream
+
+	push 0
+	retrieve
+	dup
+	push 'y'
+	sub
+	jz .restart
+
+	dup
+	push 'n'
+	sub
+	jz exit
+
+	drop
+	jmp .gameloop
+
+.restart:
+	call newline
+	call newline
+	call newline
+	call newline
+	call newline
+	call newline
+	call newline
+	call newline
+	call newline
+	call newline
+	call newline
+	call newline
+	call newline
+	call newline
+	call newline
+	
+	call welcomeMessage
+	call print
+
+	call getChar
+	call clearInputStream
+	
+	push 1
+	push 'x'
+	store
+
+	call compare
+	jz .restartChoiceX
+
+	push 1
+	push 'o'
+	store
+
+	call compare
+	jz .restartChoiceO
+
+	jmp .restart
+.restartChoiceX:
+	drop
+	push 100
+	push 1
+	store
+	jmp .restartContinue
+
+.restartChoiceO:
+	drop
+	push 100
+	push 2
+	store
+	jmp .restartContinue
+
+.restartContinue:
+	call newline
+	call newline
+	call newline
+	call newline
+	call newline
+
+	call createBoard
+	call drawBoard
+	ret	
+
+
+# functions
+userChoiceX:
+	push 100
+	push 1
+	store
+	jmp main.userChoiceContinue
+
+userChoiceO:
+	push 100
+	push 2
+	store
+	jmp main.userChoiceContinue
+
+createBoard:
+	push 0
+.loop:
+	push 9
+	copy 1
+	sub
+	jz .return
+	dup
+	push 110
+	add
+	push 0
+	store
+	push 1
+	add
+	jmp .loop
+.return:
+	drop
+	ret
+
+drawBoard:
+	push 0
+	call .bottom
+	call .rowBtm
+	call .seperator
+	call .rowMid
+	call .seperator
+	call .rowTop
+	call .top
+	call print
+	ret
+.top:
+	push '  ┌───┬───┬───┐\n'	
+	push '\n    A   B   C  \n'
+	ret
+.rowTop:
+	push ' │\n'
+	#C1
+	push 112
+	call .getPlace
+	push ' │ '
+	#B1
+	push 111
+	call .getPlace
+	push ' │ '
+	#A1
+	push 110
+	call .getPlace
+	push '1 │ '
+	ret
+.rowMid:
+	push ' │\n'
+	#C2
+	push 115
+	call .getPlace
+	push ' │ '
+	#B2
+	push 114
+	call .getPlace
+	push ' │ '
+	#A2
+	push 113
+	call .getPlace
+	push '2 │ '
+	ret
+.rowBtm:
+	push ' │\n'
+	#C3
+	push 118
+	call .getPlace
+	push ' │ '
+	#B3
+	push 117
+	call .getPlace
+	push ' │ '
+	#A3
+	push 116
+	call .getPlace
+	push '3 │ '
+	ret
+.seperator:
+	push '  ├───┼───┼───┤\n'	
+	ret
+.bottom:
+	push '  └───┴───┴───┘\n'	
+	ret
+.getPlace:
+	retrieve
+	push 1
+	sub
+	dup
+	jz xIcon
+	dup
+	jn bIcon
+	jmp oIcon
+.getPlaceRet:
+	ret
+
+checkForWin:
+	#check horizontal
+	push 0
+	push 1
+	store
+
+	push 110
+	call .check
+	push 113
+	call .check
+	push 116
+	call .check
+
+	#check vertical
+	push 0
+	push 3
+	store
+
+	push 110
+	call .check
+	push 111
+	call .check
+	push 112
+	call .check
+
+	# A1 C3 diagonal
+	push 0
+	push 4
+	store
+
+	push 110
+	call .check
+
+	# C1 A3 diagonal
+	push 0
+	push 2
+	store
+
+	push 112
+	call .check
+
+	call .checkTie
+
+	jmp return
+
+.check:
+	dup
+	retrieve
+	dup
+	jz .returnDropTwo
+	swap
+	push 0
+	retrieve
+	add
+	swap
+	copy 1
+	retrieve
+	dup
+	jz .returnDropThree
+	swap
+	copy 1
+	sub
+	jz .continue
+	jmp .returnDropTwo
+.continue:
+	swap
+	push 0
+	retrieve
+	add
+	retrieve
+	dup
+	jz .returnDropTwo
+	copy 1
+	sub
+	dup
+	jz main.gameEnd
+	jmp .returnDropTwo
+
+.checkTie:
+	push 110
+	retrieve
+	jz .return
+	push 111
+	retrieve
+	jz .return
+	push 112
+	retrieve
+	jz .return
+	push 113
+	retrieve
+	jz .return
+	push 114
+	retrieve
+	jz .return
+	push 115
+	retrieve
+	jz .return
+	push 116
+	retrieve
+	jz .return
+	push 117
+	retrieve
+	jz .return
+	push 118
+	retrieve
+	jz .return
+
+	push 0
+	push 0
+	jmp main.gameEnd
+
+.returnDropThree:
+	drop
+	jmp .returnDropTwo
+.returnDropTwo:
+	drop
+	jmp .returnDropOne
+.returnDropOne:
+	drop
+	jmp .return
+.return:
+	ret
+
+# general use
+print:
+	dup
+	jz .return
+	printc
+	jmp print
+.return:
+	drop
+	ret
+
+newline:
+	push '\n'
+	printc
+	ret
+
+getChar:
+	push 0
+	readc
+	ret
+	
+clearInputStream:
+	push 2
+	push 2
+	readc
+	retrieve
+	push '\n'
+	sub
+	jz .return
+	jmp clearInputStream
+.return:
+	push 2
+	push 0
+	store
+	ret
+
+compare:
+	push 0
+	retrieve
+	push 1 
+	retrieve
+	sub
+	ret
+
+return:
+	ret
+
+exit:
+	drop
+	end
